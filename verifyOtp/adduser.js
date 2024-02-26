@@ -1,10 +1,15 @@
+require('dotenv').config();
 const connectToDb = require('../config/mongoConnection');
-const collectionName = "user";
+
+const database = process.env.DATABASE;
+const collectionName = process.env.USERTABLE;
 
 async function addUser(userData) {
+    let client;
     try {
-        const db = await connectToDb();
-        const collection = db.collection("user");
+        client = await connectToDb();
+        const db = client.db(database);
+        const collection = db.collection(collectionName);
 
         const query = {
             email: userData.email,
@@ -16,6 +21,13 @@ async function addUser(userData) {
     } catch (error) {
         console.error('Error adding user:', error);
         throw error;
+    } finally {
+        if (client) {
+            console.log("Monogo Connection closing");
+            await client.close();
+            console.log("Monogo Collection close");
+        }
+
     }
 }
 

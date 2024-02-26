@@ -1,9 +1,16 @@
+require('dotenv').config();
+const e = require('express');
 const connectToDb = require('../config/mongoConnection');
-const collectionName = "otp_table"
+const sendMail = require('./sendMail');
+
+const database = process.env.DATABASE;
+const collectionName = process.env.OTPTABLE;
 
 async function storeOtp(name,email){
+    let client;
     try{
-        const db = await connectToDb();
+        client = await connectToDb();
+        const db = client.db(database);
         const collection = db.collection(collectionName);
 
         const otp = Math.floor(Math.random() * 9000) + 1000;
@@ -20,10 +27,18 @@ async function storeOtp(name,email){
         };
 
         await collection.insertOne(params);
+        await sendMail(name,email,otp);
         return true;
     } catch (error) {
         console.error('Error:', error.message);
         throw error;
+    } finally {
+        if (client) {
+            console.log("Monogo Connection closing");
+            await client.close();
+            console.log("Monogo Collection close");
+        }
+
     }
 }
 

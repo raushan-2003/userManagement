@@ -1,10 +1,14 @@
+require('dotenv').config();
 const connectToDb = require('../config/mongoConnection');
-const collectionName = "otp_table";
 
+const database = process.env.DATABASE;
+const collectionName = process.env.OTPTABLE;
 
 async function deleteOtp() {
+    let client;
     try {
-        const db = await connectToDb();
+        client = await connectToDb();
+        const db = client.db(database);
         const collection = db.collection(collectionName);
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
@@ -20,6 +24,13 @@ async function deleteOtp() {
     } catch (error) {
         console.error('Error:', error.message);
         throw error;
+    }  finally {
+        if (client) {
+            console.log("Monogo Connection closing");
+            await client.close();
+            console.log("Monogo Collection close");
+        }
+
     }
 }
 

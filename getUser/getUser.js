@@ -1,10 +1,14 @@
-const connectToDb = require('./connection');
+require('dotenv').config();
+const connectToDb = require('../config/mongoConnection');
 
-const collectionName = "user";
+const database = process.env.DATABASE;
+const collectionName = process.env.USERTABLE;
 
 async function getUser() {
+    let client;
     try {
-        let db = await connectToDb();
+        client = await connectToDb();
+        let db = client.db(database);
         let collection = db.collection(collectionName);
 
         const collections = await db.listCollections().toArray();
@@ -28,10 +32,23 @@ async function getUser() {
         console.log("Error Fetching User : ", e.message);
         return {
             statusCode: 500,
-            body: e.message 
+            body: e.message
         };
+    } finally {
+        if (client) {
+            console.log("Monogo Connection closing");
+            await client.close();
+            console.log("Monogo Collection close");
+        }
+
     }
 }
 
+// getUser().then((res) => {
+//     if (res) {
+//         console.log(res)
+//     }
+// })
 
 module.exports = getUser; // Export the getUser function without calling it
+
