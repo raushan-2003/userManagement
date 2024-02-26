@@ -10,8 +10,8 @@ async function getUser() {
     try {
         client = await connectToDb();
         let db = client.db(database);
-        console.log("Connection Db : ",db);
-        // let collection = db.collection(collectionName);
+        // console.log("Connection Db : ",db);
+        let collection = db.collection(collectionName);
 
         const collections = await db.listCollections().toArray();
         const collectionExists = collections.some(coll => coll.name === collectionName);
