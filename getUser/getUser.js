@@ -3,13 +3,15 @@ const connectToDb = require('../config/mongoConnection');
 
 const database = process.env.DATABASE;
 const collectionName = process.env.USERTABLE;
+console.log("Database : ",database);
 
 async function getUser() {
     let client;
     try {
         client = await connectToDb();
         let db = client.db(database);
-        let collection = db.collection(collectionName);
+        console.log("Connection Db : ",db);
+        // let collection = db.collection(collectionName);
 
         const collections = await db.listCollections().toArray();
         const collectionExists = collections.some(coll => coll.name === collectionName);
